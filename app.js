@@ -310,5 +310,6 @@ installHiddenProfessions();
 installUniversityEra();
 installAcuteChoices();
 installAfterlifeVariety();
+installCareerPositions();
 installRuntimeDiagnostics();
 if(s)save();
