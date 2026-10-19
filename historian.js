@@ -1,0 +1,36 @@
+'use strict';
+careers.push({id:'historian',name:'역사 연구자',description:'지역사·민속·종교사의 기록과 구전 전승을 연구한다. 문헌·인문 과정 졸업 후 지원한다.'});
+careerEconomy.historian=96;careerEntry.historian=['오컬트',1];jobPrimary.historian='오컬트';JOB_PRACTICE.historian=['오컬트','박학','관찰'];CAREER_SKILLS.historian={};DEGREE_REQUIREMENTS.historian='humanities';careerPaths.historian=['독립 향토사 연구실','사서'];
+for(const id of ['university','fallen'])parentJobs[id].push(['historian','역사 연구자']);
+PARENT_DAILY_LEARNING.historian=[['박학','부모가 오래된 문서의 날짜를 맞추는 일을 도왔다.'],['오컬트','부모와 지역의 전승이 기록마다 달라지는 이유를 이야기했다.'],['관찰','옛 사진과 지금의 거리에서 달라진 흔적을 찾았다.']];
+const historicalParentScenes=[
+['historian','할머니마다 다른 이야기','역사를 연구하는 부모가 같은 다리에 관한 전승 세 편을 읽어 준다. 누구의 말이 맞는지보다 언제부터 이야기가 달라졌는지 묻는다.','전승의 차이를 적고 옛 지도와 비교한다.','오컬트'],
+['historian','접힌 발굴 수첩','부모의 답사 수첩에는 무서운 그림보다 날짜와 누구에게 들었는지가 꼼꼼하게 적혀 있다. 확인하지 못한 이야기는 따로 표시해 두었다.','들었던 말과 실제로 본 흔적을 구별해 기록한다.','관찰'],
+['professor','강연 뒤의 민속 자료','교수인 부모가 지역 전승을 모은 연구자의 자료를 집으로 가져왔다. 같은 풍습을 서로 다르게 적은 쪽지가 있다.','어떤 말이 반복되고 무엇이 덧붙었는지 비교한다.','오컬트'],
+['libraryworker','낡은 지방지의 여백','도서관에서 일하는 부모가 지역 신문을 정리한다. 작은 축제와 금기 이야기가 책의 여백에 따로 적혀 있다.','기사와 여백의 이야기를 나눠 적고 출처를 찾는다.','오컬트'],
+['teacher','마을에서 들은 옛말','교사인 부모가 수업에 쓸 마을 이야기를 모은다. 낯선 풍습을 우스운 미신으로만 적지 말자고 말한다.','이야기를 전한 사람에게 뜻을 다시 물어 기록한다.','박학'],
+['antiquarian','물건보다 오래된 풍습','골동품을 다루는 부모가 작은 장식의 용도를 묻는다. 판매자는 행운을 부르는 물건이라지만 옛 장부에는 장례용이라고 적혀 있다.','물건의 문양과 지역 풍습의 기록을 대조한다.','오컬트']
+];
+for(const [parent,title,text,action,skill] of historicalParentScenes)childhoodEvents.push({id:'parent_history_'+parent+'_'+childhoodEvents.length,parent,title,text,choices:[{text:action,bonus:[3,0,0],focusSkill:skill,routes:['역사 연구자'],success:'부모와 기록을 대조하며 전승도 출처와 맥락을 확인해야 한다는 것을 배웠다.'},{text:'자료 속 사람들의 평범한 생활 이야기를 듣는다.',bonus:[0,2,0],focusSkill:'듣기',bond:1,success:'신기한 이야기 뒤에 실제로 살았던 사람들의 일상을 떠올렸다.'}]});
+growthChoicePool.push({id:'historian_prep',text:'지역의 전승과 종교사를 비교하며 인문대 진학을 준비한다',minAge:12,bonus:[4,0,0],focusSkill:'오컬트',routes:['역사 연구자'],trait:'전승의 출처를 묻는 습관',condition:r=>['university','fallen'].includes(r.family)||['historian','professor','libraryworker','teacher','antiquarian'].includes(r.parentJob)||skillValue('박학',r)>=15},{id:'historian_field',text:'옛 지도와 마을의 흔적을 비교하는 향토사 답사에 참여한다',minAge:14,bonus:[3,0,0],focusSkill:'관찰',routes:['역사 연구자'],trait:'답사에서 배운 기록',condition:r=>r.routes.includes('역사 연구자')||r.parentJob==='historian'});
+const historicalWork=[
+['출처 없는 금기','출판사가 출처가 불명확한 마을 금기를 신비한 실화로 소개해 달라고 한다. 제보자는 자신의 이름이 실리는 것을 두려워한다.','구전과 문헌을 대조하고 확인되지 않은 부분을 구별한다.','제보자의 동의 범위 안에서만 이야기를 싣는다.'],
+['폐가의 현장 기록','폐가 철거 전에 지역사 기록을 남길 기회가 왔다. 소유주는 안에 든 물건의 용도까지 단정해 달라고 요구한다.','문양과 장례 풍습을 비교하되 관찰하지 못한 것은 남겨 둔다.','사람들의 기억부터 기록하고 물건 해석은 유보한다.'],
+['후원자가 원하는 결론','후원자는 자기 가문의 오래된 의식을 고귀한 전통으로 써 달라고 한다. 일꾼들의 구술에는 강요와 실종 이야기가 섞여 있다.','당시 전승과 구술 기록을 함께 검토해 보고서를 작성한다.','후원을 일부 포기하고 구술자의 신원을 지킨다.'],
+['다시 열린 민속 강연','강연 뒤 청중이 금기와 의식을 실제로 따라 해 보고 싶다고 한다. 흥행을 위해 자극적인 시범을 해 달라는 요청도 왔다.','의식의 역사와 위험을 설명하고 재현 대신 기록을 보여 준다.','공개 범위를 줄이고 질문을 받아 오해를 바로잡는다.']
+];
+for(const [i,row] of historicalWork.entries())professionEvents.push({id:'historian_work_'+i,job:'historian',title:row[0],text:row[1],choices:[{text:row[2],skill:'오컬트',careerRep:6,careerXP:2,wealth:8,failureWealth:-15,failureCareerRep:-2,success:'전승과 사실의 경계를 지킨 연구를 남겼다. 다음 자료를 맡기겠다는 연락이 왔다.',failure:'자료의 맥락을 놓쳐 정정 작업과 비용이 생겼다. 제보자와 출처를 다시 확인했다.'},{text:row[3],careerRep:3,careerXP:1,wealth:-8,bond:1,success:'수입 일부를 포기했지만 자료를 제공한 사람과 신뢰를 지켰다.'},{text:'$40을 들여 다른 연구자와 원본 자료를 교차 검토한다.',wealth:-40,skill:'박학',careerRep:4,careerXP:1,success:'원본과 사본을 함께 검토해 해석의 오류를 줄였다.',failure:'사본과 원본이 달라 결론을 미뤘다. 검토 비용은 돌려받지 못했다.'},{text:'출처가 약한 부분을 감추고 흥미로운 결론으로 보수를 받는다.',wealth:15,careerRep:1,careerXP:1,flags:{careerShortcut:true},success:'원고는 팔렸지만 확인하지 않은 이야기가 당신의 이름으로 남았다.'}]});
+const HISTORICAL_MOTIFS={nora:'이름을 문에 붙드는 민간 의례',factory:'기계에 사람의 몫을 바치던 지역 금기',debt:'이름을 담보로 적던 계약 전승',patient:'목소리와 몸을 나눈다는 의례 보고',press:'이름 없는 행렬을 그린 옛 벽화',boarding:'빈 식탁에 자리를 내주던 임대 풍습',beacon:'죽은 배의 호출에 답하지 말라는 항만 금기',orchard:'철 지난 열매와 우물을 격리하던 농촌 기록',portrait:'사람의 상을 붙드는 카메라 실험의 민간 해석',burial:'묘역의 마른 경계와 장례 금기'};
+function installHistorian(){
+ const parentLinks=applyLifeLinks;applyLifeLinks=function(e,c,ok){parentLinks(e,c,ok);if(ok&&s.pending?.kind==='childhood'&&e.id.startsWith('parent_history_')&&c.routes)s.routes=[...new Set([...s.routes,...c.routes])]};
+ const oldRequirement=careerRequirement;careerRequirement=id=>id==='historian'?'문헌·인문 과정 졸업 필요':oldRequirement(id);
+ const oldCollege=collegeAvailable;collegeAvailable=()=>s.routes.includes('역사 연구자')||oldCollege();
+ const score=careerGrowthScore;careerGrowthScore=function(c){let n=score(c);if(c.routes?.includes('역사 연구자')){if(['historian','professor','libraryworker','teacher','antiquarian'].includes(s.parentJob))n+=8;if(['university','fallen'].includes(s.family))n+=3}return n};
+ const bonus=jobBackgroundBonus;jobBackgroundBonus=function(id){if(id!=='historian'){const b=bonus(id);if(s.parentJob==='historian'&&['researcher','librarian'].includes(id)){b.value=Math.min(35,b.value+10);b.reasons.push('부모의 기록 연구와 연결 +10')}return b}let value=0,reasons=[];if(['university','fallen'].includes(s.family)){value+=10;reasons.push('집안에서 접한 역사 자료 +10')}if(['historian','professor','libraryworker','teacher','antiquarian'].includes(s.parentJob)){value+=10;reasons.push('부모에게 배운 자료와 전승 +10')}if(s.routes.includes('역사 연구자')){value+=25;reasons.push('준비한 진로 +25')}if(s.education.degree==='humanities'){value+=10;reasons.push('관련 전공 이수 +10')}return {value:Math.min(35,value),reasons}};
+ const fork=careerForkEvent;careerForkEvent=function(){const e=fork();if(s.jobId!=='historian'&&s.education.degree==='humanities')e.choices.push({text:'인문 전공과 배운 전승을 바탕으로 역사 연구자에 지원한다.',switchJob:'historian',success:'역사 연구 분야의 지원 결과를 확인했다.'});return e};
+ const edu=educationEvent;educationEvent=function(){const e=edu();return {...e,choices:e.choices.map(c=>c.educationPlan==='humanities'?{...c,text:c.text.replace('사서 지원 자격','역사 연구자·사서 지원 자격')}:c)}};
+ const college=collegeEvent;collegeEvent=function(){const e=college();if(s.education.enrolled?.track==='humanities')e.choices.push({text:'학비 $25를 내고 지역 전승·종교사 세미나와 전공 수업을 함께 듣는다.',wealth:-25,collegeStudy:true,historicalSeminar:true,success:'전공 수업과 함께 전승의 출처를 비교하는 세미나를 마쳤다.'});return e};
+ const chooseBase=choose;choose=function(i){const c=currentEvent()?.choices[i],seminar=Boolean(c?.historicalSeminar&&choiceAvailable(c)&&!s.result&&!s.ended);const result=chooseBase(i);if(seminar&&s.result){learnSkill('오컬트',4,'인문대 지역 전승·종교사 세미나');s.result+=' 전승과 의례를 자료로 읽는 경험이 쌓였다.';save();render()}return result};
+ const current=currentEvent;currentEvent=function(){const e=current();if(!e||s.result||s.jobId!=='historian'||!isInvestigation()||exclusiveMadness())return e;const id=currentArcId(),final=id==='nora'?4:arcById(id).chapters.length-1;if(s.pending.index===0||s.pending.index===final)return e;const evidence=e.choices.find(c=>c.evidence)?.evidence;if(!evidence)return e;return {...e,choices:[...e.choices,{text:'역사 연구자로서 '+HISTORICAL_MOTIFS[id]+'의 출처를 현장 기록과 대조한다.',skill:'오컬트',evidence,branchMode:'archive',stressReduction:3,success:'비슷해 보이는 전승의 과장을 걷어 내고 실제 기록과 맞는 단서를 찾았다. '+e.lead,failure:'관련 기록은 확보했지만 전승의 상징과 실제 현상을 구별하지 못한 공백이 남았다. '+e.lead}]}};
+ for(const id of ['press','portrait','burial']){const arc=arcById(id),eligible=arc.eligible;arc.eligible=r=>r.jobId==='historian'||eligible(r)}
+}
