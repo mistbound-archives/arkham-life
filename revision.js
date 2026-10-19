@@ -106,5 +106,5 @@ function renderFailedFinalCheck(){
  const a=s?.critical?.failedAttempt;if(!a||s.result)return '';const r=a.roll;
  const roll=r?'<div class="dice-result"><div class="percentile-dice" aria-hidden="true"><span>'+String(Math.floor((r.roll===100?0:r.roll)/10)*10).padStart(2,'0')+'</span><span>'+(r.roll===100?0:r.roll%10)+'</span></div><p><strong>'+escapeHTML(r.skill)+'</strong> · '+(r.difficulty===2?'어려운 판정':r.difficulty>2?'극도로 어려운 판정':'일반 판정')+' · 목표 '+Number(r.target)+' 이하 · 1d100 = <strong>'+Number(r.roll)+'</strong> · 실패</p></div>':'';
  const g=r?.growth;const growth=g?'<p class="growth-rolls">성장 판정 · '+escapeHTML(r.skill)+' · 1d100 '+Number(g.roll)+' / '+Number(g.target)+' · '+(g.gain?'1d5 '+Number(g.die)+' → 기능 +'+Number(g.gain):'성장 없음')+'</p>':'';
- return '<section class="result result-failure" role="status"><h4>최종 대응 · 실패</h4><div class="result-story"><p>'+formatProse(a.text)+'</p></div>'+roll+growth+'</section>';
+ const support=r?.supportGrowth;const secondary=support?'<p class="growth-rolls support-growth">보조 경험 · '+escapeHTML(support.skill)+' · 성장 1d100 '+Number(support.roll)+' / '+Number(support.target)+' · '+(support.gain?'기능 +1':'성장 없음')+'</p>':'';return '<section class="result result-failure" role="status"><h4>최종 대응 · 실패</h4><div class="result-story"><p>'+formatProse(a.text)+'</p></div>'+roll+growth+secondary+'</section>';
 }

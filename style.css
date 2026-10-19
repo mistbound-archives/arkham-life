@@ -29,3 +29,12 @@ main{max-width:1480px}.play-layout{display:grid;grid-template-columns:310px minm
 .experience-gains{padding:16px;margin:16px 0;border:1px solid #947b4d;background:#f4ecd7}.experience-gains>strong{font-size:14px;color:#67502c}.experience-gain{margin:12px 0;padding:12px 14px;border-left:3px solid #687869;background:#faf5e8}.experience-gain.rare{border-left-color:#b28a35;background:#f5e6bc}.experience-gain small,.experience-tier{font-size:10px;font-style:normal;letter-spacing:.05em;color:#84632c}.experience-gain h4{font-size:15px;margin:4px 0 7px}.experience-gain p{font-size:12px!important;line-height:1.7!important;margin:6px 0!important}.experience-panel .experience-tier{display:inline-block;border:1px solid #b4a17c;padding:1px 5px;margin-right:5px}
 
 .madness-cost{color:#963f3f}.madness-benefit{color:#5c4779}.madness-route-label{color:#6d4685;font-weight:700}.madness-summary small{display:block;line-height:1.6;color:#665674}
+
+.character-creation{max-width:380px;margin:20px 0}.character-creation summary span{font-size:11px;color:var(--muted)}.character-creation label{display:block;margin:12px 0 6px;font-size:13px}.character-creation input,.character-creation select{display:block;box-sizing:border-box;width:100%;padding:10px;background:#f5efdf;color:#253e38;border:1px solid #aaa58e;font:inherit}.character-creation input:focus,.character-creation select:focus{outline:2px solid #4d6355;outline-offset:2px}
+
+/* v0.43: 선택지 위계 */
+.choice-alternatives,.choice-focus{padding:.7rem;border:1px solid var(--line,#aaa58c);margin:.5rem 0}.choice-alternatives summary,.choice-focus summary{cursor:pointer;font-size:.9rem}.choice-alternatives .choice,.choice-focus .choice{margin-top:.6rem}.choice-focus{border-color:#88719a}.choice-focus summary{color:#745183}.acute-choices{padding:.8rem;border-left:3px solid #88719a}.university-services>button{display:block;width:100%;text-align:left;margin:.6rem 0}.university-services small{display:block;line-height:1.6}
+
+.choice-alternatives .choice,.choice-focus .choice,.acute-choices .choice{display:block;width:100%}.era-memo{font-style:italic;color:#68716a}
+
+.acute-notice{padding:1rem;margin:.7rem 0;border-left:3px solid #88719a;background:#dfd6e440}.acute-notice.result-failure{border-color:#8b4033}.acute-notice small{display:block}.acute-guidance{color:#745183!important;font-size:.85rem!important}

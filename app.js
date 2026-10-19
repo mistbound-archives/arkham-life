@@ -54,7 +54,7 @@ function start(){
  initialiseLifeLinks(s);initialiseRecovery(s);initialiseEncounters(s);migrateSkills(s);initialisePersonalTraits(s,true);initialiseCrisis(s);s.purchased=[];s.supplies=0;s.resultOutcome=null;settings.paused=false;saveSettings();addLog(`출생 성향 「${birthDefinition().name}」과 단점 「${drawbackDefinition().name}」을 지녔다.`);addLog(`${family.name}에서 태어났다. ${family.text}`);save();show('game');render();
 }
 function show(id){screen=id;['landing','game','archive'].forEach(k=>$(k).hidden=k!==id);$('time-controls').hidden=id!=='game'||!s||s.ended;lastTick=performance.now();if(id==='landing')$('resume').hidden=!s}
-function checkOutcome(value,target,difficulty=1){return value<=Math.floor(target/difficulty)}
+function checkOutcome(value,target,difficulty=1){return value<=Math.max(1,Math.floor(target/difficulty))}
 function applyEffects(effect){
  if(effect.wealth)changeFunds(effect.wealth,'선택의 수입·지출');
  if(effect.hpMax){const previous=s.maxHp;s.maxHp=clamp(s.maxHp+effect.hpMax,1,99);s.hp+=s.maxHp-previous}
@@ -179,7 +179,7 @@ function advance(){
  s.year++;
  if(s.phase==='adult'){
   const age=s.year-s.birthYear;
-  applyEffects({hp:age<55?1:age>=70?-2:0,san:s.bond>=5?1:0});
+  applyEffects({hp:ageingHealthChange(age),san:s.bond>=5?1:0});
   if(shouldEndLife(age)){finish('여생 — 마지막 페이지');return true}
   if(!s.hp){finish('사망 — 남겨진 기록');return true}
  }
@@ -204,7 +204,7 @@ function render(){
   const stage=growthStages[pending.index];title=stage.title;text=stage.text;choices=growthOptions(stage).map((c,i)=>{const cost=Math.max(0,-(c.wealth||0)),notes=[growthHint(c),cost?'비용 $'+cost:'',s.wealth<cost?'비용 부족':''].filter(Boolean).join(' · ');return `<button class="choice" data-growth="${i}" ${s.wealth<cost?'disabled':''}>${escapeHTML(c.text)}${notes?'<small>'+notes+'</small>':''}</button>`}).join('');
  }else if(pending?.kind==='career'){
   title='당신의 직업';text='앞으로 살아갈 일에 지원한다. 전문직은 준비한 실력을 채용 심사에서 보여야 한다. 의사는 특히 엄격한 심사를 거친다. 학력이 필요한 직업은 대학 과정을 마쳐야 지원할 수 있다. 불합격 뒤에는 공부를 더 할지 당장 구할 일을 시작할지 결정한다.';
-  choices=careers.map((c,i)=>`<button class="choice" data-job="${i}" ${canChooseCareer(c.id)?'':'disabled'}>${escapeHTML(c.name)}<small>${escapeHTML(c.description)} <b>${escapeHTML(careerEntry[c.id]?("판정: "+careerEntry[c.id][0]+" · "+hiringBonusLabel(c.id)):"채용 판정 없음")}</b> ${!degreeAllows(c.id)?escapeHTML(careerRequirement(c.id))+' · ':''}연 수입 $${careerEconomy[c.id]} · 생활비 $${78}. ${s.routes.includes(c.name)?'익숙한 배움이 이 길로 이어진다.':''}</small></button>`).join('');
+  choices=careers.map((c,i)=>!careerVisible(c)?'':`<button class="choice" data-job="${i}" ${canChooseCareer(c.id)?'':'disabled'}>${escapeHTML(c.name)}<small>${escapeHTML(c.description)} <b>${escapeHTML(careerEntry[c.id]?("판정: "+careerEntry[c.id][0]+" · "+hiringBonusLabel(c.id)):"채용 판정 없음")}</b> ${!degreeAllows(c.id)?escapeHTML(careerRequirement(c.id))+' · ':''}연 수입 $${careerEconomy[c.id]} · 생활비 $${78}. ${s.routes.includes(c.name)?'익숙한 배움이 이 길로 이어진다.':''}</small></button>`).join('');
  }else if(pending?.kind==='studyYear'){title='다음 도전을 준비하는 해';text='구직 상태로 생활비를 감당하며 정해 둔 공부를 이어간다. 두 해를 채우면 다시 지원할지 일을 시작할지 선택한다.';
  }else if(pending?.kind==='inpatient'){title='정신병원에서 보내는 해';text='광기의 후유증을 치료하며 지낸다. 일과 조사는 할 수 없고 수입도 없지만, 바깥 사건의 기한은 계속 흐른다.';
  }else if(pending?.kind==='recuperation'){title='회복을 위해 멈춘 한 해';text='치료와 휴식에 시간을 썼다. 지금의 조사는 다음 해 다시 시작한다. 올해 수입과 지연의 대가는 기록에 남는다.';
@@ -213,7 +213,7 @@ function render(){
   if(s.pending.kind==='case')text=chapterText(s.pending.index);
   if(s.pending.kind==='investigation')text=newChapterText();
   if(event.branchScene)text=event.text;
-  choices=event.choices.map((c,i)=>choiceAvailable(c)?`<button class="choice${c.madnessAction||c.madnessRoute?" choice-madness":""}" data-choice="${i}">${c.madnessAction?'<span class="madness-choice-label">광기로 인한 선택</span>':""}${formatProse(c.text)}${c.madnessRoute?'<small class=madness-route-label>광기의 집중 · '+escapeHTML(madnessPool.find(m=>m.id===c.madnessRoute)?.name)+'</small>':''}${vocationLabel(c)}${s.phase==='growth'?'<small>'+escapeHTML(growthHint(c))+'</small>':''}</button>`:'').join('');
+  choices=renderCompactChoices(event);
  }else if(s.year===1900){title='1900 — 태어난 집';text=`${s.familyName}. ${families.find(f=>f.id===s.family)?.text||''} 계절이 지나면 어린 시절의 선택이 찾아옵니다.`}
  else{title=s.phase==='growth'?'자라는 날들':'조용히 흐르는 한 해';text=s.phase==='growth'?'배움과 놀이, 집안일 사이에서 조금씩 자란다.':s.resolution==='escaped'?'아캄에서 멀어진 새 거처에서 일상을 이어간다. 평범한 날들은 작은 기록으로 남긴다.':'평범한 날들도 당신의 삶이다. 특별한 일은 작은 기록으로 남겨 둔다.'}
  $('game').innerHTML=`<div class="gamehead"><div><p class="tag">${s.phase==='growth'?'성장 기록':'탐사자 파일'} / ${s.year}년</p><h2>${escapeHTML(s.name)}${s.job?' · '+escapeHTML(s.job):'의 생애'}</h2></div>${s.phase==='adult'?'<button class="secondary" id="retire">이 생애를 마무리한다</button>':''}</div>${renderCityMap()}<div class="play-layout"><aside class="status-sidebar"><h3>현재 상태</h3>${renderStats()}<h3>기능치</h3>${renderSkillProfile()}${renderPersonalTraits()}${renderMadnessSummary()}<p class=education-status>${escapeHTML(educationStatus())}</p></aside><div class="play-main">${crisisEventPanel()}${renderAftermathPanel()}${renderWorldChanges()}${renderCityNews()}${renderMortalityNotice()}${renderFinancePanel()}${s.careMessage?`<p class="care-message" role="status">${escapeHTML(s.careMessage)}</p>`:""}<article class="event"><h3>${escapeHTML(title)}</h3>${renderExperienceGains()}${renderCaseMotivation()}<div class="scene-text">${text.split("\n\n").map(p=>"<p>"+formatProse(p)+"</p>").join("")}</div>${isInvestigation()?"<p class=scene-goal>조사의 목적: "+escapeHTML(currentEvent().goal)+"</p>":""}${s.result?`${renderResultPanel()}<p class="muted">${s.fieldContinuation?'현장 조사를 이어갑니다. 기록을 읽은 뒤 다음 장면으로 넘어갈 수 있습니다.':'시간이 다시 흐릅니다. 기록을 더 읽고 싶으면 일시정지하세요.'}</p><button class="secondary" id="continue-record">다음 기록으로 →</button>`:choices?`<p class="waiting-note">선택하는 동안 시간은 멈춥니다.</p><div class="choices">${choices}</div>`:'<p class="muted">이 해는 자동으로 지나갑니다.</p>'}${renderEvidence()}${renderProfile()}</article><details class="services"><summary>치료 · 휴식 · 지출</summary>${s.critical?"<p>눈앞의 위험에서 먼저 벗어나야 합니다. 지금은 치료·입원·구매를 할 수 없습니다.</p>":""}${renderCare()}${renderPurchases()}${renderSkillCourses()}</details><details class="journal-details"><summary>최근 생애 기록</summary><aside class="journal"><p class="tag">PERSONAL JOURNAL</p><h3>남겨진 기록</h3>${renderStoryMemo()}${renderLog()}</aside></details></div></div>`;
@@ -303,6 +303,12 @@ installLifeRecords();
 installExpandedExperiences();
 installUltimate();
 installGenerations();
+installIdentityChecks();
 installMadnessDual();
+installLegacyVault();
+installHiddenProfessions();
+installUniversityEra();
+installAcuteChoices();
+installAfterlifeVariety();
 installRuntimeDiagnostics();
 if(s)save();

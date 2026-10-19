@@ -12,15 +12,15 @@ const CASE_STAKES={
  burial:{save:'벤을 구조하고 이장 작업이 더 깊은 경계를 무너뜨리는 것을 막을 수 있다.',limit:'굴착을 중단하고 묘역과 인근 통로의 출입을 통제',reward:'묘역 관리소가 정산한 구조·안전 조사 보수',cash:45}
 };
 function caseExit(id,mode){
- const row=CASE_STAKES[id],cost=mode==='handoff'?15:0;
+ const row=CASE_STAKES[id],cost=mode==='handoff'?45:0;
  if(s.wealth<cost)return false;
  s.wealth-=cost;s.caseDecisions||={};s.caseDecisions[id]={mode,year:s.year,rewarded:false};
  if(id==='nora'){s.resolution='withdrawn';s.caseStage=5;s.noraStarted=true}else{const rec=arcState(id);rec.resolution='withdrawn';rec.finished=s.year}
  s.activeInvestigation=null;s.deferredCase=null;s.encounterLead=null;s.encounterAfter=s.year+randomInt(2,4);s.lastCrisisYear=s.year;
  syncWorldStories();const w=s.worldStories[id];w.saved=false;w.exitMode=mode;w.relationship=mode==='handoff'?'listen':'distance';
- w.modifier={income:0,cost:mode==='handoff'?1:3,until:s.year+3,name:LIFE_PROFILES[id].place};
+ w.modifier={income:0,cost:mode==='handoff'?5:3,until:s.year+3,name:LIFE_PROFILES[id].place};
  s.lastRoll=null;s.actionRolls=[];s.lastImpact=null;s.resultOutcome='neutral';
- s.result=(mode==='handoff'?'**자료와 대피 준비를 넘겼다.** $15를 써서 사본과 운송을 마련했다.':'**직접 조사를 중단했다.** 확인한 장소와 위험을 서면으로 신고하고 출입하지 않기로 했다.')+' 담당자들은 '+row.limit+'하기로 했다. **새 피해를 줄이기 위한 통제이며, 실종자 구조나 현상의 소멸이 확인된 것은 아니다.** 당신은 안으로 돌아가지 않았고 해결 보수와 평판 보상도 받지 않는다. '+(mode==='handoff'?'당사자와 연락을 유지한다.':'당사자와의 거리는 남았다.')+' 앞으로 세 해 동안 우회·격리에 따른 추가 생활비가 매년 $'+w.modifier.cost+' 든다.';
+ s.result=(mode==='handoff'?'**자료와 대피 준비를 넘겼다.** $45를 써서 자료 운송과 현장 인력의 착수금을 댔다.':'**직접 조사를 중단했다.** 확인한 장소와 위험을 서면으로 신고하고 출입하지 않기로 했다.')+' 담당자들은 '+row.limit+'하기로 했다. **새 피해를 줄이기 위한 통제이며, 실종자 구조나 현상의 소멸이 확인된 것은 아니다.** 당신은 안으로 돌아가지 않았고 해결 보수와 평판 보상도 받지 않는다. '+(mode==='handoff'?'당사자와 연락을 유지한다.':'당사자와의 거리는 남았다.')+' 앞으로 세 해 동안 우회·격리에 따른 추가 생활비가 매년 $'+w.modifier.cost+' 든다.';
  s.history.push({year:s.year,event:currentEvent()?.id||id,choice:mode,investigation:true,success:true});addLog(s.result);save();render();return true;
 }
 function rewardCaseResolution(id){
@@ -36,9 +36,9 @@ function rewardCaseResolution(id){
 }
 function installCaseStakes(){
  const init=initialiseRevision;initialiseRevision=function(r){r=init(r);if(!r.caseDecisions){r.caseDecisions={};for(const id of Object.keys(CASE_STAKES)){const result=id==='nora'?r.resolution:r.investigations?.[id]?.resolution;if(result)r.caseDecisions[id]={mode:'legacy',rewarded:false}}}return r};if(s&&!s.caseDecisions){s.caseDecisions={};for(const id of Object.keys(CASE_STAKES))if(completedArcResult(id))s.caseDecisions[id]={mode:'legacy',rewarded:false}};
- const current=currentEvent;currentEvent=function(){const e=current();if(!e||!isInvestigation()||s.result||exclusiveMadness())return e;return {...e,choices:[...e.choices.filter(c=>c.episodeOutcome!=='withdrawn'&&c.resolution!=='withdrawn'),{text:'$15를 들여 자료와 대피 준비를 담당자들에게 넘기고 현장 조사에서 물러난다. 구조와 완전한 해결은 보장되지 않으며, 세 해 동안 추가 생활비가 매년 $1 든다.',wealth:-15,caseExit:'handoff'},{text:'확인한 위험을 신고하고 직접 조사를 끝낸다. 현장은 통제되지만 찾지 못한 사람과 원인은 미해결로 남는다. 세 해 동안 추가 생활비가 매년 $3 든다.',caseExit:'report'}]}};
+ const current=currentEvent;currentEvent=function(){const e=current();if(!e||!isInvestigation()||s.result||exclusiveMadness())return e;return {...e,choices:[...e.choices.filter(c=>c.episodeOutcome!=='withdrawn'&&c.resolution!=='withdrawn'),{text:'$45를 내고 자료 운송과 현장 인력을 마련해 조사를 맡긴다. 이후 세 해 동안 관리비로 매년 $5를 부담한다. 실종자 구조 소식은 따로 기다려야 한다.',wealth:-45,caseExit:'handoff'},{text:'확인한 위험을 신고하고 직접 조사를 끝낸다. 현장은 통제되지만 찾지 못한 사람과 원인은 미해결로 남는다. 세 해 동안 추가 생활비가 매년 $3 든다.',caseExit:'report'}]}};
  const chooseBase=choose;choose=function(i){const c=currentEvent()?.choices[i];if(c?.caseExit&&!s.ended&&!s.result&&choiceAvailable(c))return caseExit(currentArcId(),c.caseExit);return chooseBase(i)};
  const after=afterCrisisChoice;afterCrisisChoice=function(e,c,ok,oldSan){const id=isInvestigation()?currentArcId():null;after(e,c,ok,oldSan);if(id&&ok)rewardCaseResolution(id)};
- const follow=lifeFollowupEvent;lifeFollowupEvent=function(id,stage){const e=follow(id,stage),w=s.worldStories[id];if(!w?.exitMode)return e;return {...e,text:e.text+'\n\n'+(w.exitMode==='handoff'?'당신이 사본과 대피 준비를 넘긴 뒤 담당자들이 현장 통제를 이어 갔다.':'당신이 위험을 신고한 뒤 담당자들이 출입 통제를 맡았다.')+' 통제 밖의 생활은 이어지지만, 실종자의 귀환과 위험의 소멸은 아직 확인되지 않았다. 이 만남은 해결 축하가 아니라 남은 사람들의 생활과 수습을 위한 자리다.'}};
+ const follow=lifeFollowupEvent;lifeFollowupEvent=function(id,stage){const e=follow(id,stage),w=s.worldStories[id];if(!w?.exitMode)return e;return {...e,text:e.text+'\n\n'+(w.exitMode==='handoff'?'당신이 사본과 대피 준비를 넘긴 뒤 담당자들이 현장 통제를 이어 갔다.':'당신이 위험을 신고한 뒤 담당자들이 출입 통제를 맡았다.')+' 통제 밖의 생활은 이어지지만, 실종자의 귀환과 위험의 소멸은 아직 확인되지 않았다. 남은 사람들은 통제 구역 밖에서 생활을 이어 가며 실종자의 소식을 기다린다.'}};
  const words=lifeAfterwords;lifeAfterwords=function(){return [...words(),...Object.entries(s.caseDecisions||{}).filter(([,v])=>['handoff','report'].includes(v.mode)).map(([id,v])=>LIFE_PROFILES[id].place+'에서는 '+(v.mode==='handoff'?'자료와 대피 준비를 넘기고 연락을 이어 갔다.':'위험을 신고하고 현장을 떠났다.')+' 출입 통제 뒤에도 실종자와 원인은 끝내 확인하지 못했다.')]};
 }
