@@ -311,5 +311,6 @@ installUniversityEra();
 installAcuteChoices();
 installAfterlifeVariety();
 installCareerPositions();
+installFinalEvidence();
 installRuntimeDiagnostics();
 if(s)save();
